@@ -45,9 +45,7 @@ const (
 // 拦截器
 // 不需要拦截的url
 var commonUrl = map[string]map[string]bool{"ApiAuth": map[string]bool{"Login": true, 
-		"Logout": true, 
-	},
-	"ApiCaptcha": map[string]bool{"Get": true, 
+		"Register": true, 
 	},
 }
 func needValidate(controller, method string) bool {

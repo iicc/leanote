@@ -1,6 +1,8 @@
 # API 列表
 
-除了/login其它的都需要另外带参数token=xxxx
+By life (life@leanote.com)
+
+除了/api/login, /api/register外其它的都需要另外带参数token=xxxx
 
 ## Auth 登录与注册
 
@@ -9,6 +11,7 @@
 参数: email, pwd, captcha(验证码)
 返回: 成功返回Ok = true, Item是token, 否则Ok = false, 若Code == S_NEED_CAPTCHA 表示需要验证码
 ```
+
 * /api/logout 注销
 ```
 无参数
