@@ -19,61 +19,6 @@ type ApiNote struct {
 	ApiBaseContrller
 }
 
-// 笔记首页, 判断是否已登录
-// 已登录, 得到用户基本信息(notebook, shareNotebook), 跳转到index.html中
-// 否则, 转向登录页面
-func (c ApiNote) Index() revel.Result {
-	c.SetLocale()
-	
-	userInfo := c.GetUserInfo()
-	
-	userId := userInfo.UserId.Hex()
-	
-	// 没有登录
-	if userId == "" {
-		return c.Redirect("/login")
-	}
-	
-	c.RenderArgs["openRegister"] = configService.IsOpenRegister()
-	
-	// 已登录了, 那么得到所有信息
-	notebooks := notebookService.GetNotebooks(userId)
-	shareNotebooks, sharedUserInfos := shareService.GetShareNotebooks(userId)
-	
-	// 还需要按时间排序(DESC)得到notes
-	notes := []info.Note{}
-	noteContent := info.NoteContent{}
-	if len(notebooks) > 0 {
-//		_, notes = noteService.ListNotes(c.getUserId(), "", false, c.GetPage(), pageSize, defaultSortField, false, false);
-		// 变成最新
-		_, notes = noteService.ListNotes(c.getUserId(), "", false, c.GetPage(), 50, defaultSortField, false, false);
-		if len(notes) > 0 {
-			noteContent = noteService.GetNoteContent(notes[0].NoteId.Hex(), userId)
-		}
-	}
-	// 当然, 还需要得到第一个notes的content
-	//...
-	
-	c.RenderArgs["isAdmin"] = leanoteUserId == userInfo.Username
-	c.RenderArgs["userInfo"] = userInfo
-	c.RenderArgs["userInfoJson"] = c.Json(userInfo)
-	c.RenderArgs["notebooks"] = c.Json(notebooks)
-	c.RenderArgs["shareNotebooks"] = c.Json(shareNotebooks)
-	c.RenderArgs["sharedUserInfos"] = c.Json(sharedUserInfos)
-	
-	c.RenderArgs["notes"] = c.Json(notes)
-	c.RenderArgs["noteContentJson"] = c.Json(noteContent)
-	c.RenderArgs["noteContent"] = noteContent.Content
-	
-	c.RenderArgs["tagsJson"] = c.Json(tagService.GetTags(c.getUserId()))
-	
-	if isDev, _ := revel.Config.Bool("mode.dev"); isDev {
-		return c.RenderTemplate("note/note-dev.html")
-	} else {
-		return c.RenderTemplate("note/note.html")
-	}
-}
-
 // 得到笔记本下的笔记
 func (c ApiNote) GetNotes(notebookId string) revel.Result {
 	re := info.NewRe()
@@ -139,15 +84,16 @@ func (c ApiNote) UpdateNoteOrContent(noteOrContent NoteOrContent) revel.Result {
 	
 	// 新添加note
 	if noteOrContent.IsNew {
-		userId := c.GetObjectUserId();
+		userId := bson.ObjectIdHex(c.getUserId())
 		myUserId := userId
 		// 为共享新建?
 		if noteOrContent.FromUserId != "" {
 			userId = bson.ObjectIdHex(noteOrContent.FromUserId)
 		}
 		
+		noteId := bson.NewObjectId()
 		note := info.Note{UserId: userId, 
-			NoteId: bson.ObjectIdHex(noteOrContent.NoteId), 
+			NoteId: noteId,
 			NotebookId: bson.ObjectIdHex(noteOrContent.NotebookId), 
 			Title: noteOrContent.Title, 
 			Tags: noteOrContent.Tags,
@@ -254,6 +200,7 @@ func (c ApiNote) CopySharedNote(noteId, notebookId, fromUserId string) revel.Res
 	return c.RenderJson(re);
 }
 
+/*
 //------------
 // search
 // 通过title搜索
@@ -276,6 +223,7 @@ func (c ApiNote) SearchNoteByTags(tags []string) revel.Result {
 	}
 	return c.RenderJson(re)
 }
+*/
 
 // 得到历史列表
 func (c ApiNote) GetHistories(noteId string) revel.Result {
@@ -283,7 +231,7 @@ func (c ApiNote) GetHistories(noteId string) revel.Result {
 	histories := noteContentHistoryService.ListHistories(noteId, c.getUserId())
 	if len(histories) > 0 {
 		re.Ok = true
-		re.List = histories
+		re.Item = histories
 	}
 	return c.RenderJson(re)
 }

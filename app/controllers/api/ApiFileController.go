@@ -22,11 +22,7 @@ type ApiFile struct {
 // 头像设置
 func (c ApiFile) UploadAvatar() revel.Result {
 	re := c.uploadImage("logo", "");
-	
-	c.RenderArgs["fileUrlPath"] = re.Id
-	c.RenderArgs["resultCode"] = re.Code
-	c.RenderArgs["resultMsg"] = re.Msg
-	
+
 	if re.Ok {
 		re.Ok = userService.UpdateAvatar(c.getUserId(), re.Id)
 		if re.Ok {
@@ -163,7 +159,7 @@ func (c ApiFile) DeleteImage(fileId string) revel.Result {
 
 // 输出image
 // 权限判断
-func (c ApiFile) OutputImage(noteId, fileId string) revel.Result {
+func (c ApiFile) OutputImage(fileId string) revel.Result {
 	path := fileService.GetFile(c.getUserId(), fileId); // 得到路径
 	if path == "" {
 		return c.RenderText("")
