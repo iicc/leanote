@@ -26,13 +26,14 @@ By life (life@leanote.com)
 	Ok: bool, 返回是否正确
 	Msg: string, 信息, 比如用户名或密码不正确
 	Code: int, 代码, -1表示未登录
+	Id: string,
 	Item: interface{}, 单条记录
 	List: []interface{}, 多条记录
 }
 ```
+如, 若返回用户信息, 则Item是UserInfo, 如果返回用户的笔记列表, 则List是笔记列表
 
 Code 值列表:
-
 ```
 S_DEFAULT = iota // 0 默认, 无意义
 S_NOT_LOGIN // 1 未登录 
@@ -40,10 +41,7 @@ S_WRONG_USERNAME_PASSWORD  // 2
 S_WRONG_CAPTCHA // 3
 S_NEED_CAPTCHA // 4
 S_NOT_OPEN_REGISTER // 4
-
 ```
-
-如果返回用户信息, 则Item是UserInfo, 如果返回用户的笔记列表, 则List是笔记列表
 
 ## 问题
 
