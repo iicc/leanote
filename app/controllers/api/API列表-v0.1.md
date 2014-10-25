@@ -63,6 +63,7 @@
 ```
 参数: notebookId, title
 返回: 成功返回 Ok = true, 否则为false
+```
 
 * /api/notebook/dragNotebooks 拖拽笔记本
 ```
