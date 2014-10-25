@@ -4,8 +4,8 @@ import (
 	"github.com/revel/revel"
 //	"encoding/json"
 //	"gopkg.in/mgo.v2/bson"
-	. "github.com/leanote/leanote/app/lea"
-//	"github.com/leanote/leanote/app/info"
+//	. "github.com/leanote/leanote/app/lea"
+	"github.com/leanote/leanote/app/info"
 //	"github.com/leanote/leanote/app/types"
 //	"io/ioutil"
 //	"fmt"
@@ -20,9 +20,15 @@ type ApiUser struct {
 	ApiBaseContrller
 }
 
-// 修改用户名, 需要重置session
+// 获取用户信息
 func (c ApiUser) Info() revel.Result {
-	Log("APIUser");
-	return c.RenderTemplate("home/index.html");
-//	return nil;
+	re := info.NewRe()
+	
+	userInfo := c.getUserInfo()
+	if userInfo.UserId == "" {
+		return c.RenderJson(re)
+	}
+	re.Ok = true
+	re.Item = userInfo
+	return c.RenderJson(re)
 }

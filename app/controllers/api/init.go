@@ -31,40 +31,22 @@ var sessionService *service.SessionService
 var pageSize = 1000
 var defaultSortField = "UpdatedTime"
 var leanoteUserId = "admin" // 不能更改
-var siteUrl = "http://leanote.com"
+
+// 状态
+const (
+	S_DEFAULT = iota // 0
+	S_NOT_LOGIN // 1
+	S_WRONG_USERNAME_PASSWORD  // 2
+	S_WRONG_CAPTCHA // 3
+	S_NEED_CAPTCHA // 4
+	S_NOT_OPEN_REGISTER // 4
+)
 
 // 拦截器
 // 不需要拦截的url
-// Index 除了Note之外都不需要
-var commonUrl = map[string]map[string]bool{"Index": map[string]bool{"Index": true, 
-		"Login": true, 
-		"DoLogin": true,
-		"Logout": true,
-		"Register": true,
-		"DoRegister": true,
-		"FindPasswword": true,
-		"DoFindPassword": true,
-		"FindPassword2": true,
-		"FindPasswordUpdate": true,
-		"Suggestion": true,
+var commonUrl = map[string]map[string]bool{"ApiAuth": map[string]bool{"Login": true, 
+		"Logout": true, 
 	},
-	"Note": map[string]bool{"ToImage": true},
-	"Blog": map[string]bool{"Index": true,
-		"View": true,
-		"AboutMe": true,
-		"Cate": true,
-		"Search": true,
-		"GetLikeAndComments": true,
-		"IncReadNum": true,
-		"ListComments": true,
-		},
-	// 用户的激活与修改邮箱都不需要登录, 通过链接地址
-	"User": map[string]bool{"UpdateEmail": true,
-		"ActiveEmail":true,
-		},
-	"Oauth": map[string]bool{"GithubCallback": true},
-	"File": map[string]bool{"OutputImage": true, "OutputFile": true},
-	"Attach": map[string]bool{"Download": true, "DownloadAll": true},
 }
 func needValidate(controller, method string) bool {
 	// 在里面
@@ -79,7 +61,17 @@ func needValidate(controller, method string) bool {
 		return true;
 	}
 }
+
+// 这里得到token, 若不是login, logout等公用操作, 必须验证是否已登录
 func AuthInterceptor(c *revel.Controller) revel.Result {
+	// 得到token /api/user/info?userId=xxx&token=xxxxx
+	token := c.Params.Values.Get("token")
+	if token == "" {
+		// 若无, 则取sessionId
+		token = c.Session.Id()
+	}
+	c.Session["_token"] = token
+	
 	// 全部变成首字大写
 	var controller = strings.Title(c.Name)
 	var method = strings.Title(c.MethodName)
@@ -90,18 +82,24 @@ func AuthInterceptor(c *revel.Controller) revel.Result {
 	}
 	
 	// 验证是否已登录
-	if userId, ok := c.Session["UserId"]; ok && userId != "" {
+	// 通过sessionService判断该token下是否有userId, 并返回userId
+	userId := sessionService.GetUserId(token)
+	c.Session["_userId"] = userId
+	if userId != "" {
 		return nil // 已登录
 	}
 	
-	// 没有登录, 判断是否是ajax操作
-	if c.Request.Header.Get("X-Requested-With") == "XMLHttpRequest" {
-		re := info.NewRe()
-		re.Msg = "NOTLOGIN"
-		return c.RenderJson(re)
-	}
-	
-	return c.Redirect("/login")
+	// 没有登录, 返回错误的信息, 需要登录
+	re := info.NewRe()
+	re.Msg = "NOTLOGIN"
+	re.Code = S_NOT_LOGIN
+	return c.RenderJson(re)
+}
+
+func init() {
+	// interceptors
+	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiAuth{})
+	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiUser{})
 }
 
 // 最外层init.go调用
@@ -126,14 +124,4 @@ func InitService() {
 	configService = service.ConfigS
 	emailService = service.EmailS
 	sessionService = service.SessionS
-}
-
-func init() {
-	// interceptors
-	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiAuth{})
-	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiUser{})
-
-	revel.OnAppStart(func() {
-		siteUrl, _ = revel.Config.String("site.url")
-	})
-}
+}	

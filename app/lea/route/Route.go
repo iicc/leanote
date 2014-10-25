@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/revel/revel"
 //	"github.com/leanote/leanote/app/service"
-//	. "github.com/leanote/leanote/app/lea"
+	. "github.com/leanote/leanote/app/lea"
 	"net/url"
 	"strings"
 )
@@ -44,11 +44,14 @@ func RouterFilter(c *revel.Controller, fc []revel.Filter) {
 	if route.ControllerName != "Static" {
 		// api设置
 		// leanote.com/api/user/get => ApiUser::Get
-		if strings.HasPrefix(path, "/api/") || strings.HasPrefix(path, "api/") {
+		//*       /api/login               ApiAuth.Login,  这里的设置, 其实已经转成了ApiAuth了
+		if strings.HasPrefix(path, "/api") && !strings.HasPrefix(route.ControllerName, "Api"){
 			route.ControllerName = "Api" + route.ControllerName
 		}
 		// end
 	}
+	
+	Log(route.ControllerName)
 	
 	// Set the action.
 	if err := c.SetAction(route.ControllerName, route.MethodName); err != nil {
