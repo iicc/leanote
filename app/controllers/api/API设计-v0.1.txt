@@ -6,7 +6,7 @@ By life (life@leanote.com)
 
 所有api的url前面带/api/, 如:
 
-`/api/user/get?userId=xxxx&token=xxxx`
+`/api/user/info?userId=xxxx&token=xxxx`
 
 ## 文件目录结构
 * 所有API的Controller都在app/api文件夹下
@@ -34,10 +34,12 @@ By life (life@leanote.com)
 Code 值列表:
 
 ```
--1 未登录
-0 默认
-1 登录需要验证码
-2 未开放注册
+S_DEFAULT = iota // 0 默认, 无意义
+S_NOT_LOGIN // 1 未登录 
+S_WRONG_USERNAME_PASSWORD  // 2
+S_WRONG_CAPTCHA // 3
+S_NEED_CAPTCHA // 4
+S_NOT_OPEN_REGISTER // 4
 
 ```
 
