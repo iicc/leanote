@@ -47,6 +47,8 @@ const (
 var commonUrl = map[string]map[string]bool{"ApiAuth": map[string]bool{"Login": true, 
 		"Logout": true, 
 	},
+	"ApiCaptcha": map[string]bool{"Get": true, 
+	},
 }
 func needValidate(controller, method string) bool {
 	// 在里面
@@ -100,6 +102,9 @@ func init() {
 	// interceptors
 	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiAuth{})
 	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiUser{})
+	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiFile{})
+	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiNote{})
+	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiNotebook{})
 }
 
 // 最外层init.go调用

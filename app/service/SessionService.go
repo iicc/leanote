@@ -74,7 +74,9 @@ func (this *SessionService) SetCaptcha(sessionId, captcha string) bool {
 // API
 func (this *SessionService) GetUserId(sessionId string) string {
 	session := this.Get(sessionId)
-	this.Update(sessionId, "SessionId", sessionId) // 为了更新时间, 保证不过期
+	// 更新updateTime, 避免过期
+	db.UpdateByQMap(db.Sessions, bson.M{"SessionId": sessionId}, 
+		bson.M{"UpdatedTime": time.Now()})
 	return session.UserId
 }
 // 登录成功后设置userId
