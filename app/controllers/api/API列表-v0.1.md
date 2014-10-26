@@ -105,30 +105,35 @@ By life (life@leanote.com)
 返回: 成功返回 Ok = true, Item为info.NoteContentHistory, 否则返回false
 ```
 
-* /api/note/updateNoteOrContent 添加/更新笔记或内容
+* /api/note/addNote 添加笔记
 ```
-参数: NoteOrContent, 结构如下(参数列表)
-	type NoteOrContent struct {
-		NotebookId string
-		NoteId string
-		UserId string
-		Title string
-		Desc string
-		ImgSrc string
-		Tags []string
-		Content string
-		Abstract string
-		IsNew bool // 是否是新建
-		IsMarkdown bool
-		FromUserId string // 为共享而新建
-		IsBlog bool // 是否是blog
-	}
-若是添加笔记, 则需要传递:
-	NotebookId, Title, Tags, Desc, ImgSrc, IsBlog, IsMarkdown, Content, Abstract
-若是更新笔记, 则:
-	NoteId, UserId 必传
-	Desc, ImgSrc, Title, Tags, Content和Abstract 这些可以选择性传递
-返回: 成功返回 Ok = true, 若是新建笔记Item是note; 否则返回false
+参数: 
+		NotebookId string 必传
+		Title string 可选
+		Desc string 可选
+		ImgSrc string 可选
+		Tags []string 可选
+		Content string 可选
+		Abstract string 可选
+		IsMarkdown bool 可选
+		FromUserId string // 为共享而新建 可选
+		IsBlog bool // 是否是blog 可选
+
+返回: 成功返回 Ok = true, Item是note; 否则返回false
+```
+
+* /api/note/updateNote 更新笔记
+```
+参数:
+		NoteId string 必传
+		Title string 可选
+		Desc string 可选
+		ImgSrc string 可选
+		Tags []string 可选
+		Content string 可选
+		Abstract string 可选
+		
+返回: 成功返回 Ok = true; 否则返回false
 ```
 
 * /api/note/deleteNote 删除笔记

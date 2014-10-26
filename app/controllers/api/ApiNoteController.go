@@ -78,41 +78,43 @@ type NoteOrContent struct {
 	FromUserId string // 为共享而新建
 	IsBlog bool // 是否是blog, 更新note不需要修改, 添加note时才有可能用到, 此时需要判断notebook是否设为Blog
 }
-// 这里不能用json, 要用post
-func (c ApiNote) UpdateNoteOrContent(noteOrContent NoteOrContent) revel.Result {
-	re := info.NewRe()
-	
-	// 新添加note
-	if noteOrContent.IsNew {
-		userId := bson.ObjectIdHex(c.getUserId())
-		myUserId := userId
-		// 为共享新建?
-		if noteOrContent.FromUserId != "" {
-			userId = bson.ObjectIdHex(noteOrContent.FromUserId)
-		}
-		
-		noteId := bson.NewObjectId()
-		note := info.Note{UserId: userId, 
-			NoteId: noteId,
-			NotebookId: bson.ObjectIdHex(noteOrContent.NotebookId), 
-			Title: noteOrContent.Title, 
-			Tags: noteOrContent.Tags,
-			Desc: noteOrContent.Desc,
-			ImgSrc: noteOrContent.ImgSrc,
-			IsBlog: noteOrContent.IsBlog,
-			IsMarkdown: noteOrContent.IsMarkdown,
-		};
-		noteContent := info.NoteContent{NoteId: note.NoteId, 
-			UserId: userId, 
-			IsBlog: note.IsBlog,
-			Content: noteOrContent.Content, 
-			Abstract: noteOrContent.Abstract};
-		
-		note = noteService.AddNoteAndContent(note, noteContent, myUserId)
-		re.Ok = true
-		re.Item = note
-		return c.RenderJson(re)
+
+// 添加笔记
+func (c ApiNote) AddNote(noteOrContent NoteOrContent) revel.Result {
+	userId := bson.ObjectIdHex(c.getUserId())
+	myUserId := userId
+	// 为共享新建?
+	if noteOrContent.FromUserId != "" {
+		userId = bson.ObjectIdHex(noteOrContent.FromUserId)
 	}
+	
+	noteId := bson.NewObjectId()
+	note := info.Note{UserId: userId, 
+		NoteId: noteId,
+		NotebookId: bson.ObjectIdHex(noteOrContent.NotebookId), 
+		Title: noteOrContent.Title, 
+		Tags: noteOrContent.Tags,
+		Desc: noteOrContent.Desc,
+		ImgSrc: noteOrContent.ImgSrc,
+		IsBlog: noteOrContent.IsBlog,
+		IsMarkdown: noteOrContent.IsMarkdown,
+	};
+	noteContent := info.NoteContent{NoteId: note.NoteId, 
+		UserId: userId, 
+		IsBlog: note.IsBlog,
+		Content: noteOrContent.Content, 
+		Abstract: noteOrContent.Abstract};
+	
+	note = noteService.AddNoteAndContent(note, noteContent, myUserId)
+	re := info.NewRe()
+	re.Ok = true
+	re.Item = note
+	return c.RenderJson(re)
+}
+
+// 更新笔记
+func (c ApiNote) UpdateNote(noteOrContent NoteOrContent) revel.Result {
+	re := info.NewRe()
 	
 	noteUpdate := bson.M{}
 	needUpdateNote := false
