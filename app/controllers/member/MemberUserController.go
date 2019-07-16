@@ -13,34 +13,28 @@ type MemberUser struct {
 func (c MemberUser) Username() revel.Result {
 	c.SetUserInfo()
 	c.SetLocale()
-	c.RenderArgs["title"] = "Username"
-	return c.RenderTemplate("member/user/username.html");
+	c.ViewArgs["title"] = c.Message("Username")
+	return c.RenderTemplate("member/user/username.html")
 }
 
 func (c MemberUser) Email() revel.Result {
 	c.SetUserInfo()
 	c.SetLocale()
-	c.RenderArgs["title"] = "Email"
-	return c.RenderTemplate("member/user/email.html");
+	c.ViewArgs["title"] = c.Message("Email")
+	return c.RenderTemplate("member/user/email.html")
 }
 
 func (c MemberUser) Password() revel.Result {
 	c.SetUserInfo()
 	c.SetLocale()
-	c.RenderArgs["title"] = "Password"
-	return c.RenderTemplate("member/user/password.html");
+	c.ViewArgs["title"] = c.Message("Password")
+	return c.RenderTemplate("member/user/password.html")
 }
 
 func (c MemberUser) Avatar() revel.Result {
 	c.SetUserInfo()
 	c.SetLocale()
-	c.RenderArgs["title"] = "Avatar"
-	c.RenderArgs["globalConfigs"] = configService.GetGlobalConfigForUser()
-	return c.RenderTemplate("member/user/avatar.html");
-}
-func (c MemberUser) AddAccount() revel.Result {
-	c.SetUserInfo()
-	c.SetLocale()
-	c.RenderArgs["title"] = "Add Account"
-	return c.RenderTemplate("member/user/add_account.html");
+	c.ViewArgs["title"] = c.Message("Avatar")
+	c.ViewArgs["globalConfigs"] = configService.GetGlobalConfigForUser()
+	return c.RenderTemplate("member/user/avatar.html")
 }

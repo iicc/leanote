@@ -1,4 +1,46 @@
 @font-face {
+  font-family: 'leanote';
+  src: url('../../fonts/leanote-font3/leanote.eot?-vcf23i');
+  src: url('../../fonts/leanote-font3/leanote.eot?#iefix-vcf23i') format('embedded-opentype'), url('../../fonts/leanote-font3/leanote.ttf?-vcf23i') format('truetype'), url('../../fonts/leanote-font3/leanote.woff?-vcf23i') format('woff'), url('../../fonts/leanote-font3/leanote.svg?-vcf23i#leanote') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+#logo,
+.mce-i-mind,
+.mce-i-ace-pre,
+.lea-icon {
+  font-family: 'leanote' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-markdown:before {
+  content: "\e604";
+}
+.mce-i-mind:before {
+  content: "\e602";
+}
+.mce-i-ace-pre:before {
+  content: "\e603";
+}
+#logo:before {
+  content: "\e901";
+  line-height: 1;
+  margin-top: 5px;
+  display: inline-block;
+  vertical-align: top;
+}
+#logo.icon-only:before {
+  content: "\e902";
+}
+.lang-zh-cn #logo:before {
+  content: "\e900";
+}
+@font-face {
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 300;
@@ -22,6 +64,11 @@
   font-weight: 400;
   src: local('Open Sans Italic'), local('OpenSans-Italic'), url('../fonts/open-sans2/xjAJXh38I15wypJXxuGMBobN6UDyHWBl620a-IRfuBk.woff') format('woff');
 }
+#logo {
+  font-size: 32px;
+  color: #000;
+  padding-top: 8px;
+}
 /*"HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue", Helvetica, "Microsoft Yahei", Verdana, Simsun, "Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol",  "BBAlpha Sans", "S60 Sans", Arial, sans-serif;*/
 ::selection {
   background: #000000;
@@ -37,7 +84,7 @@
 }
 *,
 body {
-  font-family: 'Open Sans', '微软雅黑', Arial, Tahoma, sans-serif;
+  font-family: "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
   font-weight: 300;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -45,7 +92,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: 'Open Sans', '微软雅黑', Arial, Tahoma, sans-serif;
+  font-family: "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 }
 a {
   cursor: pointer;
@@ -60,18 +107,27 @@ a:hover {
   margin: 0;
 }
 #headerContainer .navbar-brand {
-  padding: 0;
   padding-left: 10px;
-  line-height: 60px;
 }
 #headerContainer .navbar-brand img {
   height: 50px;
   display: inline-block;
   margin-top: -5px;
+  padding: 8px;
 }
 #headerContainer .navbar-nav a {
   line-height: 60px;
   padding: 0 10px;
+}
+#lang {
+  position: absolute;
+  right: 10px;
+  top: -2px;
+  z-index: 11111;
+}
+#lang a {
+  font-size: 12px;
+  padding-left: 10px;
 }
 #postsContainer,
 #suggestion {
@@ -161,6 +217,7 @@ section {
 #navbar {
   float: right;
   background: #fff;
+  padding-right: 0;
 }
 #loginBtns {
   border-left: 1px solid #eee;
@@ -213,6 +270,9 @@ section {
   .navbar-nav #loginBtns {
     padding-right: 10px;
     padding-bottom: 5px;
+  }
+  #lang {
+    display: none;
   }
 }
 @media screen and (max-width: 600px) {
@@ -367,17 +427,78 @@ input,
   border-radius: 2px;
   border-radius: 3px;
 }
-.btn-github {
+.third-account {
+  text-align: center;
+}
+.third-account .btn {
+  width: 105px;
   padding-left: 12px;
   padding-right: 12px;
+}
+.third-account .btn-qq {
+  color: #fff !important;
+  background-color: #0873CE;
+  border-color: #0873CE;
+}
+.third-account .btn-qq:hover {
+  color: #fff !important;
+  background-color: #4C96D5;
+  border-color: #0873CE;
+}
+.third-account .btn-github {
+  color: #fff !important;
+  background-color: #000;
+  border-color: #000;
+}
+.third-account .btn-github:hover {
+  color: #fff !important;
+  background-color: #333;
+  border-color: #000;
+}
+.third-account .btn-google {
+  padding-left: 12px;
+  padding-right: 12px;
+  color: #fff !important;
+  background-color: #357ae8;
+  border-color: #2f5bb7;
+}
+.third-account .btn-google:hover {
+  color: #fff !important;
+  background-color: #4d90fe;
+  border-color: #2f5bb7;
+}
+.third-account .btn-weibo {
+  color: #fff !important;
+  background-color: #D04341;
+  border-color: #D04341;
+}
+.third-account .btn-weibo:hover {
+  color: #fff !important;
+  background-color: #cb3432;
+  border-color: #cb3432;
+}
+.third-account .btn-facebook {
   color: #fff !important;
   background-color: #335397;
   border-color: #335397;
 }
-.btn-github:hover {
+.third-account .btn-facebook:hover {
   color: #fff !important;
   background-color: #2d4984;
   border-color: #294279;
+}
+.third-account .btn-twitter {
+  color: #fff !important;
+  background-color: #00c7f7;
+  border-color: #00c7f7;
+}
+.third-account .btn-twitter:hover {
+  color: #fff !important;
+  background-color: #00b2de;
+  border-color: #00a6ce;
+}
+.third-account .third-split {
+  height: 3px;
 }
 .btn > i.pull-left,
 .btn > i.pull-right {
@@ -610,4 +731,16 @@ input,
 }
 .hide-img {
   opacity: 0;
+}
+.footer-leanote {
+  margin-top: 20px;
+  color: #475F77;
+  text-align: center;
+}
+#footer .footer-leanote a {
+  color: #475F77;
+}
+/* news */
+.index-news a:hover {
+  text-decoration: underline !important;
 }

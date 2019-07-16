@@ -1,6 +1,7 @@
 @bgColor: #fff;
 @headerBgColor: #fff;
-@fontFamily:  'Open Sans', '微软雅黑', Arial, Tahoma, sans-serif;
+@fontFamily: 'Open Sans', '微软雅黑', Arial, Tahoma, sans-serif;
+@fontFamily: "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 @aWhiteColor: #fff;
 @aBlackColor: #000;
 @borderColor: #EBEFF2;
@@ -11,6 +12,8 @@
 @fontSize: 14px;
 @containerWidth: 945px;
 @titleColor: #5AD4A0;
+
+@import "./theme/includes/icon.less";
 
 // font
 @font-face {
@@ -36,6 +39,12 @@
   font-style: italic;
   font-weight: 400;
   src: local('Open Sans Italic'), local('OpenSans-Italic'), url('../fonts/open-sans2/xjAJXh38I15wypJXxuGMBobN6UDyHWBl620a-IRfuBk.woff') format('woff');
+}
+
+#logo {
+	font-size: 32px;
+	color: #000;
+    padding-top: 8px;
 }
 
 /*"HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue", Helvetica, "Microsoft Yahei", Verdana, Simsun, "Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol",  "BBAlpha Sans", "S60 Sans", Arial, sans-serif;*/
@@ -73,13 +82,13 @@ a:hover {
 	box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.1);
 	margin: 0;
 	.navbar-brand {
-		padding: 0;
 		padding-left: 10px;
-		line-height: @headerHeight;
+		// line-height: @headerHeight;
 		img {
 			height: 50px;
 			display: inline-block;
 			margin-top: -5px;
+			padding: 8px;
 		}
 	}
 	.navbar-nav a {
@@ -87,6 +96,18 @@ a:hover {
 		padding: 0 10px;
 	}
 }
+
+#lang {
+	position: absolute;
+	right: 10px;
+	top: -2px;
+	z-index: 11111;
+	a {
+		font-size: 12px;
+		padding-left: 10px;
+	}
+}
+
 #header, #posts, #loginContainer {
 }
 #postsContainer, #suggestion {
@@ -182,6 +203,7 @@ section {
 #navbar {
 	float: right;
 	background: #fff;
+	padding-right: 0;
 }
 
 #loginBtns {
@@ -237,6 +259,10 @@ section {
 			padding-bottom: 5px;
 		}
 	}
+
+	#lang {
+		display: none;
+	}
 }
 @media screen and (max-width:600px) {
 	.header .btn {
@@ -246,6 +272,7 @@ section {
 	.mobile {
 		top: 0 !important;
 	}
+
 }
 /* posts */
 #posts {
@@ -412,18 +439,84 @@ input, .form-control {
 	border-radius: 2px;
 	border-radius: 3px;
 }
-.btn-github {
-	padding-left: 12px;
-	padding-right: 12px;
-	color: #fff !important;
-	background-color: #335397;
-	border-color: #335397;
+.third-account {
+	text-align: center;
+	.btn {
+		width: 105px;
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+	
+	.btn-qq {
+		color: #fff !important;
+		background-color: #0873CE;
+		border-color: #0873CE;
+	}
+	.btn-qq:hover {
+		color: #fff !important;
+		background-color: #4C96D5;
+		border-color: #0873CE;
+	}
+	
+	.btn-github {
+		color: #fff !important;
+		background-color: #000;
+		border-color: #000;
+	}
+	.btn-github:hover {
+		color: #fff !important;
+		background-color: #333;
+		border-color: #000;
+	}
+	.btn-google {
+		padding-left: 12px;
+		padding-right: 12px;
+		color: #fff !important;
+		background-color: #357ae8;
+		border-color: #2f5bb7;
+	}
+	.btn-google:hover {
+		color: #fff !important;
+		background-color: #4d90fe;
+		border-color: #2f5bb7;
+	}
+	.btn-weibo {
+		color: #fff !important;
+		background-color: #D04341;
+		border-color: #D04341;
+	}
+	.btn-weibo:hover {
+		color: #fff !important;
+		background-color: #cb3432;
+		border-color: #cb3432;
+	}
+	.btn-facebook {
+		color: #fff !important;
+		background-color: #335397;
+		border-color: #335397;
+	}
+	.btn-facebook:hover {
+		color: #fff !important;
+		background-color: #2d4984;
+		border-color: #294279;
+	}
+	.btn-twitter {
+		color: #fff !important;
+		background-color: #00c7f7;
+		border-color: #00c7f7;
+	}
+	.btn-twitter:hover {
+		color: #fff !important;
+		background-color: #00b2de;
+		border-color: #00a6ce;
+	}
+
+	.third-split {
+		height: 3px;
+	}
+
 }
-.btn-github:hover {
-	color: #fff !important;
-	background-color: #2d4984;
-	border-color: #294279;
-}
+
 .btn>i.pull-left, .btn>i.pull-right {
 	line-height: 1.428571429;
 }
@@ -689,4 +782,20 @@ input, .form-control {
 }
 .hide-img {
     opacity: 0;
+}
+
+.footer-leanote {
+	margin-top: 20px;
+	color: #475F77;
+	text-align: center;
+}
+#footer .footer-leanote a {
+	color: #475F77;
+}
+
+/* news */
+.index-news {
+	a:hover {
+		text-decoration: underline !important;
+	}
 }

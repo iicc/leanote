@@ -21,6 +21,10 @@ Notebook.getCurNotebookId = function() {
 	return Notebook.curNotebookId;
 };
 
+Notebook.getCurNotebook = function() {
+	return Notebook.cache[Notebook.curNotebookId];
+};
+
 // 笔记本的笔记数量更新
 Notebook._updateNotebookNumberNotes = function(notebookId, n) {
 	var self = this;
@@ -249,6 +253,12 @@ Notebook.renderNotebooks = function(notebooks) {
 		notebooks = [];
 	}
 	
+	// title可能有<script>
+	for(var i = 0, len = notebooks.length; i < len; ++i) {
+		var notebook = notebooks[i];
+		notebook.Title = trimTitle(notebook.Title);
+	}
+	
 	notebooks = [{NotebookId: Notebook.allNotebookId, Title: getMsg("all"), drop:false, drag: false}].concat(notebooks);
 	notebooks.push({NotebookId: Notebook.trashNotebookId, Title: getMsg("trash"), drop:false, drag: false});
 	Notebook.notebooks = notebooks; // 缓存之
@@ -287,7 +297,7 @@ Notebook.cacheAllNotebooks = function(notebooks) {
 			self.cacheAllNotebooks(notebook.Subs);
 		}
 	}
-}
+};
 
 // 展开到笔记本
 Notebook.expandNotebookTo = function(notebookId, userId) {
@@ -322,8 +332,7 @@ Notebook.expandNotebookTo = function(notebookId, userId) {
 			break;
 		}
 	}
-}
-
+};
 
 // RenderNotebooks调用, 
 // nav 为了新建, 快速选择, 移动笔记
@@ -331,7 +340,7 @@ Notebook.expandNotebookTo = function(notebookId, userId) {
 Notebook.renderNav = function(nav) {
 	var self = this;
 	self.changeNav();
-}
+};
 
 // 搜索notebook
 Notebook.searchNotebookForAddNote = function(key) {
@@ -355,7 +364,7 @@ Notebook.searchNotebookForAddNote = function(key) {
 	} else {
 		$("#notebookNavForNewNote").html(self.everNavForNewNote);
 	}
-}
+};
 
 // 搜索notebook
 Notebook.searchNotebookForList = function(key) {
@@ -381,8 +390,7 @@ Notebook.searchNotebookForList = function(key) {
 		$notebookList.show();
 		$("#notebookNavForNewNote").html(self.everNavForNewNote);
 	}
-}
-
+};
 
 // 修改,添加,删除notebook后调用
 // 改变nav
@@ -412,7 +420,7 @@ Notebook.getChangedNotebooks = function(notebooks) {
 		navForNewNote += eachForNew;
 	}
 	return navForNewNote;
-}
+};
 
 Notebook.everNavForNewNote = "";
 Notebook.everNotebooks = [];
@@ -428,13 +436,9 @@ Notebook.changeNav = function() {
 	$("#notebookNavForNewNote").html(html);
 	
 	// 移动, 复制重新来, 因为nav变了, 移动至-----的notebook导航也变了
-	// 这里速度很慢
-	var t1 = (new Date()).getTime();
 	Note.initContextmenu();
 	Share.initContextmenu(Note.notebooksCopy);
-	var t2 = (new Date()).getTime();
-	log(t2-t1);
-}
+};
 
 /**
  * 我的共享notebooks	    
@@ -523,7 +527,7 @@ Notebook.changeNotebookNavForNewNote = function(notebookId, title) {
 			Notebook.changeNotebookNavForNewNote(notebookId, title);
 		}
 	}
-}
+};
 
 // 改变导航, 两处
 // 单击左侧, 单击新建下拉时调用
@@ -540,7 +544,7 @@ Notebook.toggleToMyNav = function(userId, notebookId) {
 	
 	// 搜索tag隐藏
 	$("#tagSearch").hide();
-}
+};
 Notebook.changeNotebookNav = function(notebookId) {
 	Notebook.curNotebookId = notebookId;
 	Notebook.toggleToMyNav();
@@ -563,15 +567,18 @@ Notebook.changeNotebookNav = function(notebookId) {
 
 Notebook.isAllNotebookId = function(notebookId) {
 	return notebookId == Notebook.allNotebookId;
-}
+};
 Notebook.isTrashNotebookId = function(notebookId) {
 	return notebookId == Notebook.trashNotebookId;
-}
+};
 // 当前选中的笔记本是否是"所有"
 // called by Note
 Notebook.curActiveNotebookIsAll = function() {
-	return Notebook.isAllNotebookId($("#notebookList .active").attr("notebookId"));
-}
+	return Notebook.isAllNotebookId($("#notebookList .curSelectedNode").attr("notebookId"));
+};
+Notebook.curActiveNotebookIsTrash = function() {
+	return Notebook.isTrashNotebookId($("#notebookList .curSelectedNode").attr("notebookId"));
+};
 
 // 改变笔记本
 // 0. 改变样式
@@ -579,6 +586,7 @@ Notebook.curActiveNotebookIsAll = function() {
 // 2. ajax得到该notebook下的所有note
 // 3. 使用Note.RederNotes()
 // callback Pjax, 当popstate时调用
+Notebook.changeNotebookSeq = 1;
 Notebook.changeNotebook = function(notebookId, callback) {
 	var me = this;
 	Notebook.changeNotebookNav(notebookId);
@@ -602,37 +610,54 @@ Notebook.changeNotebook = function(notebookId, callback) {
 		param = {};
 		// 得到全部的...
 		cacheNotes = Note.getNotesByNotebookId();
-		if(!isEmpty(cacheNotes)) { // 万一真的是没有呢?
+		// 数量一致
+		if(!isEmpty(cacheNotes)) { 
 			if(callback) {
 				callback(cacheNotes);
 			} else {
-				Note.renderNotesAndFirstOneContent(cacheNotes);
+				Note.renderNotesAndFirstOneContent(cacheNotes, true);
 			}
 			return;
-		}
+		} 
 	} else {
 		cacheNotes = Note.getNotesByNotebookId(notebookId);
-		if(!isEmpty(cacheNotes)) { // 万一真的是没有呢? 执行后面的ajax
+		var notebook = Notebook.cache[notebookId];
+		var len = cacheNotes ? cacheNotes.length : 0;
+		// alert( notebook.NumberNotes + " " + len);
+		if(len == notebook.NumberNotes) { 
 			if(callback) {
 				callback(cacheNotes);
 			} else {
-				Note.renderNotesAndFirstOneContent(cacheNotes);
+				Note.renderNotesAndFirstOneContent(cacheNotes, true);
 			}
 			return;
+		} else {
+			Note.clearCacheByNotebookId(notebookId);
+			log('数量不一致');
 		}
 	}
 	
 	// 2 得到笔记本
 	// 这里可以缓存起来, note按notebookId缓存
+	// 这里可能点击过快导致前面点击的后来才返回
 	me.showNoteAndEditorLoading();
-	ajaxGet(url, param, function(cacheNotes) { 
-		if(callback) {
-			callback(cacheNotes);
-		} else {
-			Note.renderNotesAndFirstOneContent(cacheNotes);
-		}
-		me.hideNoteAndEditorLoading();
-	});
+	me.changeNotebookSeq++;
+	(function(seq) {
+		ajaxGet(url, param, function(cacheNotes) { 
+			// 后面点击过快, 之前的结果不要了
+			if(seq != me.changeNotebookSeq) {
+				log("notebook changed too fast!");
+				log(cacheNotes);
+				return;
+			}
+			if(callback) {
+				callback(cacheNotes);
+			} else {
+				Note.renderNotesAndFirstOneContent(cacheNotes, false);
+			}
+			me.hideNoteAndEditorLoading();
+		});
+	})(me.changeNotebookSeq);
 }
 
 // 笔记列表与编辑器的mask loading
@@ -703,19 +728,22 @@ Notebook.setNotebook2Blog = function(target) {
 	// 那么, 如果当前是该notebook下, 重新渲染之
 	if(Notebook.curNotebookId == notebookId) {
 		if(isBlog) {
-			$("#noteList .item-blog").show();
+			$('.item').addClass('item-b');
 		} else {
-			$("#noteList .item-blog").hide();
+			$('.item').removeClass('item-b');
 		}
-		
 	// 如果当前在所有笔记本下
 	} else if(Notebook.curNotebookId == Notebook.allNotebookId){
 		$("#noteItemList .item").each(function(){
 			var noteId = $(this).attr("noteId");
 			var note = Note.cache[noteId];
 			if(note.NotebookId == notebookId) {
-				if(isBlog) $(this).find(".item-blog").show();
-				else $(this).find(".item-blog").hide();
+				if (isBlog) {
+					$(this).addClass('item-b');
+				}
+				else {
+					$(this).removeClass('item-b');
+				}
 			}
 		});
 	}

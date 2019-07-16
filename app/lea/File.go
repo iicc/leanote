@@ -56,6 +56,14 @@ func ClearDir(dir string) bool {
 	return true
 }
 
+func MkdirAll(dir string) bool {
+	err := os.MkdirAll(dir, 0777)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 // list dir's all file, return filenames
 func ListDir(dir string) []string {
 	f, err := os.Open(dir)
@@ -108,13 +116,13 @@ func CopyDir(source string, dest string) (err error) {
 			// create sub-directories - recursively
 			err = CopyDir(sourcefilepointer, destinationfilepointer)
 			if err != nil {
-//				fmt.Println(err)
+				//				fmt.Println(err)
 			}
 		} else {
 			// perform copy
 			_, err = CopyFile(sourcefilepointer, destinationfilepointer)
 			if err != nil {
-//				fmt.Println(err)
+				//				fmt.Println(err)
 			}
 		}
 	}
@@ -175,7 +183,6 @@ func PutFileStrContent(path, content string) bool {
 	//	Log(path)
 
 	if err1 != nil {
-		Log(err1)
 		return false
 	}
 	return true

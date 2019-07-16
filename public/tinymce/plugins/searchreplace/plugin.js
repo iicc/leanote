@@ -9,6 +9,7 @@
  */
 
 /*jshint smarttabs:true, undef:true, unused:true, latedef:true, curly:true, bitwise:true */
+/*eslint no-labels:0, no-constant-condition: 0 */
 /*global tinymce:true */
 
 (function() {
@@ -176,7 +177,7 @@
 				makeReplacementNode = nodeName;
 			}
 
-			return function replace(range) {
+			return function(range) {
 				var before, after, parentNode, startNode = range.startNode,
 					endNode = range.endNode, matchIndex = range.matchIndex;
 
@@ -276,7 +277,9 @@
 				type: 'window',
 				layout: "flex",
 				pack: "center",
-				align: "center",
+				align: "right",
+				classes: "find-replace-ctn",
+				// minWidth: 300,
 				onClose: function() {
 					editor.focus();
 					self.done();
@@ -361,12 +364,15 @@
 					]
 				}
 			}).renderTo().reflow();
+			
+			// 立即到最右
+			win.moveTo($('body').width()-$('.mce-find-replace-ctn').width(), 60)
 		}
 
 		self.init = function(ed) {
 			ed.addMenuItem('searchreplace', {
 				text: 'Find and replace',
-				shortcut: 'Ctrl+F',
+				shortcut: 'Meta+F',
 				onclick: showDialog,
 				separator: 'before',
 				context: 'edit'
@@ -374,23 +380,32 @@
 
 			ed.addButton('searchreplace', {
 				tooltip: 'Find and replace',
-				shortcut: 'Ctrl+F',
+				shortcut: 'Meta+F',
 				onclick: showDialog
 			});
-			
-			ed.addCommand("SearchReplace", showDialog);
 
-			ed.shortcuts.add('Ctrl+F', '', showDialog);
+			ed.addCommand("SearchReplace", showDialog);
+			ed.shortcuts.add('Meta+F', '', showDialog);
 		};
+
+		function getElmIndex(elm) {
+			var value = elm.getAttribute('data-mce-index');
+
+			if (typeof value == "number") {
+				return "" + value;
+			}
+
+			return value;
+		}
 
 		function markAllMatches(regex) {
 			var node, marker;
 
 			marker = editor.dom.create('span', {
-				"class": 'mce-match-marker',
 				"data-mce-bogus": 1
 			});
 
+			marker.className = 'mce-match-marker'; // IE 7 adds class="mce-match-marker" and class=mce-match-marker
 			node = editor.getBody();
 
 			self.done(false);
@@ -400,7 +415,11 @@
 
 		function unwrap(node) {
 			var parentNode = node.parentNode;
-			parentNode.insertBefore(node.firstChild, node);
+
+			if (node.firstChild) {
+				parentNode.insertBefore(node.firstChild, node);
+			}
+
 			node.parentNode.removeChild(node);
 		}
 
@@ -410,7 +429,7 @@
 			nodes = tinymce.toArray(editor.getBody().getElementsByTagName('span'));
 			if (nodes.length) {
 				for (var i = 0; i < nodes.length; i++) {
-					var nodeIndex = nodes[i].getAttribute('data-mce-index');
+					var nodeIndex = getElmIndex(nodes[i]);
 
 					if (nodeIndex === null || !nodeIndex.length) {
 						continue;
@@ -441,8 +460,7 @@
 			var spans = findSpansByIndex(testIndex);
 			if (spans.length) {
 				dom.addClass(findSpansByIndex(testIndex), 'mce-match-marker-selected');
-				editor.selection.scrollIntoView(spans[0]); // 移动到这个文字, 神奇
-				log(editor)
+				editor.selection.scrollIntoView(spans[0]);
 				return testIndex;
 			}
 
@@ -491,7 +509,7 @@
 			node = editor.getBody();
 			nodes = tinymce.toArray(node.getElementsByTagName('span'));
 			for (i = 0; i < nodes.length; i++) {
-				var nodeIndex = nodes[i].getAttribute('data-mce-index');
+				var nodeIndex = getElmIndex(nodes[i]);
 
 				if (nodeIndex === null || !nodeIndex.length) {
 					continue;
@@ -507,7 +525,7 @@
 					}
 
 					while (nodes[++i]) {
-						matchIndex = nodes[i].getAttribute('data-mce-index');
+						matchIndex = getElmIndex(nodes[i]);
 
 						if (nodeIndex === null || !nodeIndex.length) {
 							continue;
@@ -548,7 +566,7 @@
 
 			nodes = tinymce.toArray(editor.getBody().getElementsByTagName('span'));
 			for (i = 0; i < nodes.length; i++) {
-				var nodeIndex = nodes[i].getAttribute('data-mce-index');
+				var nodeIndex = getElmIndex(nodes[i]);
 
 				if (nodeIndex !== null && nodeIndex.length) {
 					if (nodeIndex === currentIndex.toString()) {

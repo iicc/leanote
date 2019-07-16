@@ -204,6 +204,11 @@ ul.dropdown-menu {
 #footer {
   padding-bottom: 10px;
 }
+.footer-leanote {
+    text-align: center;
+    padding: 3px 0;
+    color: #ccc;
+}
 .navbar-brand {
   display: none;
 }
@@ -259,6 +264,7 @@ a:hover {
   width: 200px;
   border-right: 1px solid #ebeff2;
   text-align: right;
+  overflow: scroll;
 }
 #headerContainer {
   width: 190px;
@@ -578,4 +584,7 @@ table tr:nth-child(2n) {
 	border: 1px solid #ddd;
 	border-collapse: collapse;
 	padding: 6px 13px;
+}
+.desc *, #content * {
+    word-wrap: break-word;
 }

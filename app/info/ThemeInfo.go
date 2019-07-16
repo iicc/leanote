@@ -14,11 +14,11 @@ type Theme struct {
 	Version   string                 `Version`
 	Author    string                 `Author`
 	AuthorUrl string                 `AuthorUrl`
-	Path      string                 `Path`     // 文件夹路径
+	Path      string                 `Path`     // 文件夹路径, public/upload/54d7620d99c37b030600002c/themes/54d867c799c37b533e000001
 	Info      map[string]interface{} `Info`     // 所有信息
 	IsActive  bool                   `IsActive` // 是否在用
 
-	IsDefault bool   `IsDefault` // leanote默认主题, 如果用户修改了默认主题, 则先copy之. 也是admin用户的主题
+	IsDefault bool   `IsDefault`       // leanote默认主题, 如果用户修改了默认主题, 则先copy之. 也是admin用户的主题
 	Style     string `Style,omitempty` // 之前的, 只有default的用户才有blog_default, blog_daqi, blog_left_fixed
 
 	CreatedTime time.Time `CreatedTime`

@@ -13,27 +13,27 @@ type Admin struct {
 // admin 主页
 func (c Admin) Index() revel.Result {
 	c.SetUserInfo()
-	
-	c.RenderArgs["title"] = "leanote"
+
+	c.ViewArgs["title"] = "leanote"
 	c.SetLocale()
-	
-	c.RenderArgs["countUser"] = userService.CountUser()
-	c.RenderArgs["countNote"] = noteService.CountNote("")
-	c.RenderArgs["countBlog"] = noteService.CountBlog("")
-	
-	return c.RenderTemplate("admin/index.html");
+
+	c.ViewArgs["countUser"] = userService.CountUser()
+	c.ViewArgs["countNote"] = noteService.CountNote("")
+	c.ViewArgs["countBlog"] = noteService.CountBlog("")
+
+	return c.RenderTemplate("admin/index.html")
 }
 
 // 模板
 func (c Admin) T(t string) revel.Result {
-	c.RenderArgs["str"] = configService.GlobalStringConfigs
-	c.RenderArgs["arr"] = configService.GlobalArrayConfigs
-	c.RenderArgs["map"] = configService.GlobalMapConfigs
-	c.RenderArgs["arrMap"] = configService.GlobalArrMapConfigs
-	c.RenderArgs["version"] = configService.GetVersion()
+	c.ViewArgs["str"] = configService.GlobalStringConfigs
+	c.ViewArgs["arr"] = configService.GlobalArrayConfigs
+	c.ViewArgs["map"] = configService.GlobalMapConfigs
+	c.ViewArgs["arrMap"] = configService.GlobalArrMapConfigs
+	c.ViewArgs["version"] = configService.GetVersion()
 	return c.RenderTemplate("admin/" + t + ".html")
 }
 
 func (c Admin) GetView(view string) revel.Result {
-	return c.RenderTemplate("admin/" + view);
+	return c.RenderTemplate("admin/" + view)
 }

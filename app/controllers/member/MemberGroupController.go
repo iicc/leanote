@@ -1,8 +1,8 @@
 package member
 
 import (
-	"github.com/revel/revel"
 	"github.com/leanote/leanote/app/info"
+	"github.com/revel/revel"
 )
 
 // 分组管理
@@ -14,22 +14,22 @@ type MemberGroup struct {
 func (c MemberGroup) Index() revel.Result {
 	c.SetUserInfo()
 	c.SetLocale()
-	c.RenderArgs["title"] = "My Group"
-	c.RenderArgs["groups"] = groupService.GetGroupsAndUsers(c.GetUserId())
-	return c.RenderTemplate("member/group/index.html");
+	c.ViewArgs["title"] = c.Message("My Group")
+	c.ViewArgs["groups"] = groupService.GetGroupsAndUsers(c.GetUserId())
+	return c.RenderTemplate("member/group/index.html")
 }
 
 // 添加分组
 func (c MemberGroup) AddGroup(title string) revel.Result {
 	re := info.NewRe()
 	re.Ok, re.Item = groupService.AddGroup(c.GetUserId(), title)
-	return c.RenderJson(re)
+	return c.RenderJSON(re)
 }
 
 func (c MemberGroup) UpdateGroupTitle(groupId, title string) revel.Result {
 	re := info.NewRe()
 	re.Ok = groupService.UpdateGroupTitle(c.GetUserId(), groupId, title)
-	return c.RenderJson(re)
+	return c.RenderJSON(re)
 }
 
 func (c MemberGroup) DeleteGroup(groupId string) revel.Result {

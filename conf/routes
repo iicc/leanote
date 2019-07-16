@@ -2,10 +2,10 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-module:testrunner
+# module:testrunner
 
 # Home is My Blog
-Get 	/											Index.Index
+Get 	/											Index.Default
 GET     /note   	                                Note.Index
 # leanote home
 GET     /index   	                                Index.Index
@@ -37,9 +37,10 @@ POST	/findPasswordUpdate							Auth.FindPasswordUpdate
 * /note/copyNote Note.CopyNote
 * /note/copySharedNote Note.CopySharedNote
 * /note/searchNoteByTags Note.SearchNoteByTags
-* /note/toImage Note.ToImage
-* /note/html2Image Note.Html2Image
 * /note/setNote2Blog Note.SetNote2Blog
+* /note/exportPdf Note.ExportPDF
+* /note/toPdf Note.ToPdf
+* /note/getNoteAndContentBySrc Note.GetNoteAndContentBySrc
 # pjax
 GET     /note/:noteId   	                        Note.Index
 
@@ -127,6 +128,14 @@ GET     /upload/*filepath                       Static.Serve("public/upload")
 # the prefix of member's controllername is "Member"
 *       /member               	MemberIndex.Index
 *       /member/index           MemberIndex.Index
+
+# 不知道为什么, group就是不行 member/blog可以
+*       /member/group/index           MemberGroup.Index
+*       /member/group/addGroup           MemberGroup.AddGroup
+*       /member/group/updateGroupTitle           MemberGroup.UpdateGroupTitle
+*       /member/group/deleteGroup           MemberGroup.DeleteGroup
+*       /member/group/addUser           MemberGroup.AddUser
+*       /member/group/deleteUser           MemberGroup.DeleteUser
 
 # common
 *       /:controller/:action                    :controller.:action

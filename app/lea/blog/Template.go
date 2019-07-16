@@ -6,8 +6,8 @@ import (
 	"html/template"
 	"io/ioutil"
 	//	"os"
-	"fmt"
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"regexp"
@@ -39,9 +39,9 @@ var CloneTemplate *template.Template
 type RenderTemplateResult struct {
 	Template    *template.Template
 	PathContent map[string]string
-	RenderArgs  map[string]interface{}
-	
-	IsPreview bool // 是否是预览
+	ViewArgs map[string]interface{}
+
+	IsPreview  bool // 是否是预览
 	CurBlogTpl *BlogTpl
 }
 
@@ -62,7 +62,7 @@ func parseTemplateError(err error) (templateName string, line int, description s
 	return templateName, line, description
 }
 func (r *RenderTemplateResult) render(req *revel.Request, resp *revel.Response, wr io.Writer) {
-	err := r.Template.Execute(wr, r.RenderArgs)
+	err := r.Template.Execute(wr, r.ViewArgs)
 	if err == nil {
 		return
 	}
@@ -87,11 +87,11 @@ func (r *RenderTemplateResult) render(req *revel.Request, resp *revel.Response, 
 		Line:        line,
 		SourceLines: templateContent,
 	}
-	
+
 	// 这里, 错误!!
 	// 这里应该导向到本主题的错误页面
 	resp.Status = 500
-	ErrorResult{r.RenderArgs, compileError, r.IsPreview, r.CurBlogTpl}.Apply(req, resp)
+	ErrorResult{r.ViewArgs, compileError, r.IsPreview, r.CurBlogTpl}.Apply(req, resp)
 }
 
 func (r *RenderTemplateResult) Apply(req *revel.Request, resp *revel.Response) {
@@ -104,7 +104,7 @@ func (r *RenderTemplateResult) Apply(req *revel.Request, resp *revel.Response) {
 	chunked := revel.Config.BoolDefault("results.chunked", false)
 
 	// If it's a HEAD request, throw away the bytes.
-	out := io.Writer(resp.Out)
+	out := io.Writer(resp.GetWriter())
 	if req.Method == "HEAD" {
 		out = ioutil.Discard
 	}
@@ -117,7 +117,7 @@ func (r *RenderTemplateResult) Apply(req *revel.Request, resp *revel.Response) {
 		r.render(req, resp, out) // 这里!!!
 		return
 	}
-	
+
 	// Render the template into a temporary buffer, to see if there was an error
 	// rendering the template.  If not, then copy it into the response buffer.
 	// Otherwise, template render errors may result in unpredictable HTML (and
@@ -139,7 +139,7 @@ func Init() {
 		fileBytes, _ := ioutil.ReadFile(revel.ViewsPath + "/Blog/" + path)
 		fileStr := string(fileBytes)
 		path := "blog/" + path
-//		path := path
+		//		path := path
 		BlogTplObject.PathContent[path] = fileStr
 		BlogTplObject.Template.New(path).Parse(fileStr) // 以blog为根
 	}
@@ -157,12 +157,12 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 	// 都不会为空的
 	if basePath == "" {
 		path := "blog/" + name
-//		path := name
+		//		path := name
 		t := BlogTplObject.Template.Lookup(path)
 		r = &RenderTemplateResult{
 			Template:    t,
 			PathContent: BlogTplObject.PathContent, // 为了显示错误
-			RenderArgs:  args,                      // 把args给它
+			ViewArgs:  args,                      // 把args给它
 		}
 	} else {
 		// 复制一份
@@ -179,11 +179,9 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 
 		// 将该basePath下的所有文件提出
 		files := ListDir(basePath)
-		Log(basePath)
-		LogJ(files);
 		for _, t := range files {
 			if !strings.Contains(t, ".html") {
-				continue;
+				continue
 			}
 			fileBytes, err := ioutil.ReadFile(basePath + "/" + t)
 			if err != nil {
@@ -196,7 +194,7 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 
 		// 如果本主题下没有, 则用系统的
 		t := newBlogTplObject.Template.Lookup(name)
-		
+
 		if t == nil {
 			path := "blog/" + name
 			t = BlogTplObject.Template.Lookup(path)
@@ -204,23 +202,22 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 		r = &RenderTemplateResult{
 			Template:    t,
 			PathContent: newBlogTplObject.PathContent, // 为了显示错误
-			RenderArgs:  args,
-			CurBlogTpl: newBlogTplObject,
-			IsPreview: isPreview,
+			ViewArgs:  args,
+			CurBlogTpl:  newBlogTplObject,
+			IsPreview:   isPreview,
 		}
 	}
 
 	return r
 }
 
-
 ////////////////////
-// 错误显示
+//
 
 type ErrorResult struct {
-	RenderArgs map[string]interface{}
+	ViewArgs map[string]interface{}
 	Error      error
-	IsPreview bool
+	IsPreview  bool
 	CurBlogTpl *BlogTpl
 }
 
@@ -241,7 +238,7 @@ func (r ErrorResult) Apply(req *revel.Request, resp *revel.Response) {
 	var err error
 	templatePath := fmt.Sprintf("errors/%d.%s", status, format)
 	err = nil
-//	tmpl, err := revel.MainTemplateLoader.Template("index.html") // 这里找到错误页面主题
+	//	tmpl, err := revel.MainTemplateLoader.Template("index.html") // 这里找到错误页面主题
 
 	// This func shows a plaintext error message, in case the template rendering
 	// doesn't work.
@@ -283,20 +280,19 @@ func (r ErrorResult) Apply(req *revel.Request, resp *revel.Response) {
 		panic("no error provided")
 	}
 
-	if r.RenderArgs == nil {
-		r.RenderArgs = make(map[string]interface{})
+	if r.ViewArgs == nil {
+		r.ViewArgs = make(map[string]interface{})
 	}
-	r.RenderArgs["Error"] = revelError
-	r.RenderArgs["Router"] = revel.MainRouter
+	r.ViewArgs["Error"] = revelError
+	r.ViewArgs["Router"] = revel.MainRouter
 
 	// 不是preview就不要显示错误了
-	LogJ(revelError)
-//	if r.IsPreview {
+	if r.IsPreview {
 		var b bytes.Buffer
-		out := io.Writer(resp.Out)
+		out := io.Writer(resp.GetWriter())
 		//	out = ioutil.Discard
-		err = tmpl.Execute(&b, r.RenderArgs)
+		err = tmpl.Execute(&b, r.ViewArgs)
 		resp.WriteHeader(http.StatusOK, "text/html; charset=utf-8")
 		b.WriteTo(out)
-//	}
+	}
 }

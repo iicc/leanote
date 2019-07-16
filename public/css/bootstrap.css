@@ -7137,3 +7137,10 @@ td.visible-print {
 	font-size: 14px;
 	padding: .2em .6em .3em;
 }
+/*公式显示问题*/
+#content .MathJax * {
+    font-size: inherit;
+}
+.m-todo-item {
+  list-style: none;
+}
